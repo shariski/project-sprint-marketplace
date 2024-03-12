@@ -32,3 +32,18 @@ func (userRepository *userRepositoryImpl) Insert(ctx context.Context, user entit
 	}
 	return insertedUser, nil
 }
+
+func (userRepository *userRepositoryImpl) FindByUsername(ctx context.Context, username string) (entity.User, error) {
+	query := `
+		SELECT username, name, password
+		FROM users
+		WHERE username = $1
+	`
+	var user entity.User
+	if err := userRepository.DB.QueryRow(query, &username).Scan(&user.Username, &user.Name, &user.Password); err != nil {
+		if err == sql.ErrNoRows {
+			return entity.User{}, errors.New("no rows")
+		}
+	}
+	return user, nil
+}

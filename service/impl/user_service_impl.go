@@ -8,6 +8,8 @@ import (
 	"project-sprint-marketplace/model"
 	"project-sprint-marketplace/repository"
 	"project-sprint-marketplace/service"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type userServiceImpl struct {
@@ -16,6 +18,27 @@ type userServiceImpl struct {
 
 func NewUserServiceImpl(userRepository *repository.UserRepository) service.UserService {
 	return &userServiceImpl{UserRepository: *userRepository}
+}
+
+func (userService *userServiceImpl) Authentication(ctx context.Context, userModel model.UserModel) model.UserGetModel {
+	userResult, err := userService.UserRepository.FindByUsername(ctx, userModel.Username)
+	if err != nil {
+		panic(exception.NotFoundError{
+			Message: "User not found",
+		})
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(userResult.Password), []byte(userModel.Password))
+	if err != nil {
+		panic(exception.BadRequestError{
+			Message: "Incorrect password",
+		})
+	}
+
+	return model.UserGetModel{
+		Username: userResult.Username,
+		Name:     userResult.Name,
+	}
 }
 
 func (userService *userServiceImpl) Create(ctx context.Context, userModel model.UserModel) model.UserGetModel {
