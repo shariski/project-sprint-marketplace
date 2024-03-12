@@ -7,4 +7,5 @@ import (
 
 type TagRepository interface {
 	Insert(ctx context.Context, tag entity.Tag) error
+	DeleteByProductId(ctx context.Context, id int) error
 }

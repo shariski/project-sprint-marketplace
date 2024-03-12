@@ -6,6 +6,7 @@ import (
 	"project-sprint-marketplace/exception"
 	"project-sprint-marketplace/model"
 	"project-sprint-marketplace/service"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -21,6 +22,7 @@ func NewProductController(productService *service.ProductService, config configu
 
 func (controller ProductController) Route(app *fiber.App) {
 	app.Post("/v1/product", controller.Create)
+	app.Patch("v1/product/:id", controller.Update)
 }
 
 func (controller ProductController) Create(c *fiber.Ctx) error {
@@ -44,5 +46,36 @@ func (controller ProductController) Create(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusCreated).JSON(model.ResponseFormat{
 		Message: "product added successfully",
+	})
+}
+
+func (controller ProductController) Update(c *fiber.Ctx) error {
+	var request model.ProductUpdateModel
+	err := c.BodyParser(&request)
+	
+	if err != nil {
+		panic(err)
+	}
+	
+	productId := c.Params("id")
+
+	request.Id, err = strconv.Atoi(productId)
+	
+	if err != nil {
+		panic(err)
+	}
+
+	errors := common.ValidateInput(request)
+
+	if errors != nil {
+		panic(exception.ValidationError{
+			Message: errors.Error(),
+		})
+	}
+	
+	_ = controller.ProductService.Update(c.Context(), request)
+
+	return c.Status(fiber.StatusCreated).JSON(model.ResponseFormat{
+		Message: "product updated successfully",
 	})
 }

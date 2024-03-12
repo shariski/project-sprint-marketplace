@@ -7,4 +7,5 @@ import (
 
 type ProductRepository interface {
 	Insert(ctx context.Context, product entity.Product) (int, error)
+	Update(ctx context.Context, product entity.Product) error
 }

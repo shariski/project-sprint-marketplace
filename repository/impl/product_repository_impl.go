@@ -30,3 +30,15 @@ func (productRepository *productRepositoryImpl) Insert(ctx context.Context, prod
 
 	return productId, err
 }
+
+func (productRepository *productRepositoryImpl) Update(ctx context.Context, product entity.Product) error {
+	sql := `
+		UPDATE products SET name = $1, price = $2, image_url = $3, condition = $4, is_purchaseable = $5, updated_at = $6
+		WHERE id = $7
+	`
+
+	err := productRepository.DB.QueryRow(sql,
+		&product.Name, &product.Price, &product.ImageUrl, &product.Condition, &product.IsPurchaseable, common.GetDateNowUTCFormat(), &product.Id).Err()
+
+	return err
+}

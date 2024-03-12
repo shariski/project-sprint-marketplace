@@ -27,3 +27,14 @@ func (tagRepository *tagRepositoryImpl) Insert(ctx context.Context, tag entity.T
 
 	return err
 }
+
+func (tagRepository *tagRepositoryImpl) DeleteByProductId(ctx context.Context, productId int) error {
+	sql := `
+		DELETE FROM tags
+		WHERE product_id = $1;
+	`
+
+	err := tagRepository.DB.QueryRow(sql, productId).Err()
+
+	return err
+}
