@@ -3,8 +3,11 @@ package impl
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"fmt"
 	"project-sprint-marketplace/common"
 	"project-sprint-marketplace/entity"
+	"project-sprint-marketplace/exception"
 	"project-sprint-marketplace/repository"
 )
 
@@ -32,12 +35,29 @@ func (productRepository *productRepositoryImpl) Insert(ctx context.Context, prod
 }
 
 func (productRepository *productRepositoryImpl) Update(ctx context.Context, product entity.Product) error {
+	checkSql := `SELECT name FROM products WHERE id = $1`
+
+	var name string
+	
+	err := productRepository.DB.QueryRow(checkSql, &product.Id).Scan(&name)
+	if (err != nil) {
+		fmt.Println(err)
+		if errors.Is(err, sql.ErrNoRows) {
+			panic(exception.NotFoundError{
+				Message: "product not found",
+			})
+		} else {
+			panic(err)
+		}
+	}
+
+
 	sql := `
 		UPDATE products SET name = $1, price = $2, image_url = $3, condition = $4, is_purchaseable = $5, updated_at = $6
-		WHERE id = $7
-	`
+		WHERE id = $7;
+		`
 
-	err := productRepository.DB.QueryRow(sql,
+	err = productRepository.DB.QueryRow(sql,
 		&product.Name, &product.Price, &product.ImageUrl, &product.Condition, &product.IsPurchaseable, common.GetDateNowUTCFormat(), &product.Id).Err()
 
 	return err

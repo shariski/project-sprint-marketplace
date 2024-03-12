@@ -44,7 +44,7 @@ func (controller ProductController) Create(c *fiber.Ctx) error {
 	
 	_ = controller.ProductService.Create(c.Context(), request)
 
-	return c.Status(fiber.StatusCreated).JSON(model.ResponseFormat{
+	return c.Status(fiber.StatusOK).JSON(model.ResponseFormat{
 		Message: "product added successfully",
 	})
 }
@@ -75,7 +75,7 @@ func (controller ProductController) Update(c *fiber.Ctx) error {
 	
 	_ = controller.ProductService.Update(c.Context(), request)
 
-	return c.Status(fiber.StatusCreated).JSON(model.ResponseFormat{
+	return c.Status(fiber.StatusOK).JSON(model.ResponseFormat{
 		Message: "product updated successfully",
 	})
 }
