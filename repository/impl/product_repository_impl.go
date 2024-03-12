@@ -1,1 +1,32 @@
 package impl
+
+import (
+	"context"
+	"database/sql"
+	"project-sprint-marketplace/common"
+	"project-sprint-marketplace/entity"
+	"project-sprint-marketplace/repository"
+)
+
+type productRepositoryImpl struct {
+	*sql.DB
+}
+
+func NewProductRepositoryImpl(DB *sql.DB) repository.ProductRepository {
+	return &productRepositoryImpl{DB: DB}
+}
+
+func (productRepository *productRepositoryImpl) Insert(ctx context.Context, product entity.Product) (int, error) {
+	sql := `
+		INSERT INTO products (user_id, name, price, image_url, stock, condition, is_purchaseable, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+		RETURNING id;
+	`
+
+	var productId int
+
+	err := productRepository.DB.QueryRow(sql,
+		&product.UserId, &product.Name, &product.Price, &product.ImageUrl, &product.Stock, &product.Condition, &product.IsPurchaseable, common.GetDateNowUTCFormat(), common.GetDateNowUTCFormat()).Scan(&productId)
+
+	return productId, err
+}
