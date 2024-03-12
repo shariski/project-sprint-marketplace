@@ -1,7 +1,6 @@
 package exception
 
 import (
-	"encoding/json"
 	"project-sprint-marketplace/model"
 
 	"github.com/gofiber/fiber/v2"
@@ -11,12 +10,13 @@ func ErrorHandler(ctx *fiber.Ctx, err error) error {
 	_, validationError := err.(ValidationError)
 	if validationError {
 		data := err.Error()
-		var messages []map[string]interface{}
+		// var messages []map[string]interface{}
 
-		errJson := json.Unmarshal([]byte(data), &messages)
-		PanicLogging(errJson)
+		// errJson := json.Unmarshal([]byte(data), &messages)
+		// PanicLogging(errJson)
 		return ctx.Status(fiber.StatusBadRequest).JSON(model.ResponseErrorFormat{
 			Message: "Bad Request",
+			Errors: data,
 		})
 	}
 
