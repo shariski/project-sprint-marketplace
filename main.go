@@ -3,6 +3,7 @@ package main
 import (
 	"project-sprint-marketplace/configuration"
 	"project-sprint-marketplace/controller"
+	"project-sprint-marketplace/exception"
 	repository "project-sprint-marketplace/repository/impl"
 	service "project-sprint-marketplace/service/impl"
 
@@ -20,10 +21,11 @@ func main() {
 
 	userController := controller.NewUserController(&userService, config)
 
-	app := fiber.New()
+	app := fiber.New(configuration.NewFiberConfiguration())
 	app.Use(recover.New())
 
 	userController.Route(app)
 
-	app.Listen(":8000")
+	err := app.Listen(":8000")
+	exception.PanicLogging(err)
 }

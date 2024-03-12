@@ -28,7 +28,7 @@ func (controller UserController) Create(c *fiber.Ctx) error {
 		panic(err)
 	}
 	result := controller.UserService.Create(c.Context(), request)
-	return c.Status(201).JSON(model.ResponseFormat{
+	return c.Status(fiber.StatusCreated).JSON(model.ResponseFormat{
 		Message: "User registered succesfully",
 		Data:    result,
 	})
