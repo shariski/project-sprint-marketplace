@@ -40,14 +40,16 @@ func (productService *productServiceImpl) Create(ctx context.Context, data model
 	}
 	
 	for _,tagName := range data.Tags{
-		tag := entity.Tag{
-			ProductId: productId,
-			Name: tagName,
-		}
+		if tagName != "" {
+			tag := entity.Tag{
+				ProductId: productId,
+				Name: tagName,
+			}
 
-		err = productService.TagRepository.Insert(ctx, tag)
-		if err != nil {
-			return err
+			err = productService.TagRepository.Insert(ctx, tag)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	
