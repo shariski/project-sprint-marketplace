@@ -21,7 +21,7 @@ func main() {
 	tagRepository := repository.NewTagRepositoryImpl()
 
 	userService := service.NewUserServiceImpl(&userRepository)
-	productService := service.NewProductServiceImpl(database, &productRepository, &tagRepository)
+	productService := service.NewProductServiceImpl(database, &productRepository, &tagRepository, &userRepository)
 
 	userController := controller.NewUserController(&userService, config)
 	productController := controller.NewProductController(&productService, config)

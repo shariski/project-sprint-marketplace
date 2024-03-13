@@ -16,17 +16,20 @@ type productServiceImpl struct {
 	*sql.DB
 	repository.ProductRepository
 	repository.TagRepository
+	repository.UserRepository
 }
 
 func NewProductServiceImpl(
 	DB *sql.DB,
 	productRepository *repository.ProductRepository,
 	tagRepository *repository.TagRepository,
+	userRepository *repository.UserRepository,
 	) service.ProductService {
 	return &productServiceImpl{
 		DB: DB,
 		ProductRepository: *productRepository,
 		TagRepository: *tagRepository,
+		UserRepository: *userRepository,
 	}
 }
 
@@ -101,4 +104,16 @@ func (productService *productServiceImpl) DeleteById(ctx context.Context, id int
 
 	productService.TagRepository.DeleteByProductId(ctx, tx, id)
 	productService.ProductRepository.DeleteByProductId(ctx, tx, id)
+}
+
+func (productService *productServiceImpl) FindById(ctx context.Context, id int) model.GetProductModel {
+	product := productService.ProductRepository.FindById(ctx, productService.DB, id)
+	seller := productService.UserRepository.FindByProductId(ctx, id)
+
+	payload := model.GetProductModel{
+		Product: product,
+		Seller: seller,
+	}
+
+	return payload
 }

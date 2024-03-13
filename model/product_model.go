@@ -32,3 +32,8 @@ type ProductModel struct {
 	IsPurchaseable bool     `json:"isPurchaseable"`
 	PurchaseCount  int      `json:"purchaseCount"`
 }
+
+type GetProductModel struct {
+	Product ProductModel `json:"product"`
+	Seller  SellerModel  `json:"seller"`
+}
