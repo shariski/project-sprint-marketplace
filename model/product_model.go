@@ -22,7 +22,7 @@ type ProductUpdateModel struct {
 }
 
 type ProductModel struct {
-	Id             int      `json:"productId"`
+	Id             string   `json:"productId"`
 	Name           string   `json:"name"`
 	Price          float32  `json:"price"`
 	ImageUrl       string   `json:"imageUrl"`

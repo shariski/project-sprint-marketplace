@@ -20,7 +20,7 @@ func NewProductRepositoryImpl() repository.ProductRepository {
 
 func (productRepository *productRepositoryImpl) FindById(ctx context.Context, db *sql.DB, id int) model.ProductModel {
 	SQL := `
-		SELECT p.id AS product_id, p.name, p.price, p.image_url, p.stock, p.condition, ARRAY_AGG(t.name) AS tags, p.is_purchaseable, COALESCE(SUM(py.quantity), 0) AS purchase_count
+		SELECT p.id::varchar AS product_id, p.name, p.price, p.image_url, p.stock, p.condition, ARRAY_AGG(t.name) AS tags, p.is_purchaseable, COALESCE(SUM(py.quantity), 0) AS purchase_count
 		FROM products p
 		LEFT JOIN tags t ON p.id = t.product_id
 		LEFT JOIN payments py ON p.id = py.product_id
