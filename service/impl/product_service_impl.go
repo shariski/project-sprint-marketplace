@@ -91,3 +91,14 @@ func (productService *productServiceImpl) Update(ctx context.Context, data model
 	
 	return updatedProduct;
 }
+
+func (productService *productServiceImpl) DeleteById(ctx context.Context, id int) {
+	_ = productService.ProductRepository.FindById(ctx, productService.DB, id)
+
+	tx, err := productService.DB.Begin()
+	exception.PanicLogging(err)
+	defer common.CommitOrRollback(tx)
+
+	productService.TagRepository.DeleteByProductId(ctx, tx, id)
+	productService.ProductRepository.DeleteByProductId(ctx, tx, id)
+}

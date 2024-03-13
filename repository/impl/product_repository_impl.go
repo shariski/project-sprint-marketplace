@@ -91,3 +91,14 @@ func (productRepository *productRepositoryImpl) Update(ctx context.Context, tx *
 
 	return product
 }
+
+func (productRepository *productRepositoryImpl) DeleteByProductId(ctx context.Context, tx *sql.Tx, id int) {
+	SQL := `
+		DELETE FROM products
+		WHERE id = $1;
+		`
+
+		_, err := tx.ExecContext(ctx, SQL, id)
+
+		exception.PanicLogging(err)
+}

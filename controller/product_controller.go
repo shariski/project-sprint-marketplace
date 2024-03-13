@@ -23,6 +23,7 @@ func NewProductController(productService *service.ProductService, config configu
 func (controller ProductController) Route(app *fiber.App) {
 	app.Post("/v1/product", controller.Create)
 	app.Patch("v1/product/:id", controller.Update)
+	app.Delete("/v1/product/:id", controller.DeleteById)
 }
 
 func (controller ProductController) Create(c *fiber.Ctx) error {
@@ -71,5 +72,17 @@ func (controller ProductController) Update(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(model.ResponseFormat{
 		Message: "product updated successfully",
+	})
+}
+
+func (controller ProductController) DeleteById(c *fiber.Ctx) error {
+	productId, err := strconv.Atoi(c.Params("id"))
+	
+	exception.PanicLogging(err)
+	
+	controller.ProductService.DeleteById(c.Context(), productId)
+
+	return c.Status(fiber.StatusOK).JSON(model.ResponseFormat{
+		Message: "product deleted successfully",
 	})
 }
