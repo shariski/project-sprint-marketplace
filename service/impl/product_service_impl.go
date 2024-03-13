@@ -117,3 +117,20 @@ func (productService *productServiceImpl) FindById(ctx context.Context, id int) 
 
 	return payload
 }
+
+func (productService *productServiceImpl) UpdateStockById(ctx context.Context, data model.UpdateStockModel) entity.Product {
+	product := entity.Product{
+		Id: data.Id,
+		Stock: data.Stock,
+	}
+
+	_ = productService.ProductRepository.FindById(ctx, productService.DB, data.Id)
+
+	tx, err := productService.DB.Begin()
+	exception.PanicLogging(err)
+	defer common.CommitOrRollback(tx)
+
+	updatedProduct := productService.ProductRepository.UpdateStock(ctx, tx, product)
+	
+	return updatedProduct;
+}

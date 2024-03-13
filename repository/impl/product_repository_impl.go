@@ -102,3 +102,17 @@ func (productRepository *productRepositoryImpl) DeleteByProductId(ctx context.Co
 
 		exception.PanicLogging(err)
 }
+
+func (productRepository *productRepositoryImpl) UpdateStock(ctx context.Context, tx *sql.Tx, product entity.Product) entity.Product {
+	SQL := `
+		UPDATE products SET stock = $1
+		WHERE id = $2;
+		`
+
+	_, err := tx.ExecContext(ctx, SQL,
+		&product.Stock, &product.Id)
+
+	exception.PanicLogging(err)
+
+	return product
+}

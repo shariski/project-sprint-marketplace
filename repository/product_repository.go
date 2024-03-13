@@ -12,4 +12,5 @@ type ProductRepository interface {
 	Insert(ctx context.Context, tx *sql.Tx, product entity.Product) entity.Product
 	Update(ctx context.Context, tx *sql.Tx, product entity.Product) entity.Product
 	DeleteByProductId(ctx context.Context, tx *sql.Tx, id int)
+	UpdateStock(ctx context.Context, tx *sql.Tx, product entity.Product) entity.Product
 }

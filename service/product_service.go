@@ -11,4 +11,5 @@ type ProductService interface {
 	Update(ctx context.Context, model model.ProductUpdateModel) entity.Product
 	DeleteById(ctx context.Context, id int)
 	FindById(ctx context.Context, id int) model.GetProductModel
+	UpdateStockById(ctx context.Context, data model.UpdateStockModel) entity.Product
 }

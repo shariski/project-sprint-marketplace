@@ -37,3 +37,8 @@ type GetProductModel struct {
 	Product ProductModel `json:"product"`
 	Seller  SellerModel  `json:"seller"`
 }
+
+type UpdateStockModel struct {
+	Id    int `json:"id" validate:"required"`
+	Stock int `json:"stock" validate:"required,min=0"`
+}
