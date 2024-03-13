@@ -96,7 +96,7 @@ func (controller ProductController) GetById(c *fiber.Ctx) error {
 	result := controller.ProductService.FindById(c.Context(), productId)
 
 	return c.Status(fiber.StatusOK).JSON(model.ResponseFormat{
-		Message: "product retrieved successfully",
+		Message: "ok",
 		Data: result,
 	})
 }
