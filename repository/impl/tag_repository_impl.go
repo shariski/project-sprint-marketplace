@@ -5,36 +5,42 @@ import (
 	"database/sql"
 	"project-sprint-marketplace/common"
 	"project-sprint-marketplace/entity"
+	"project-sprint-marketplace/exception"
 	"project-sprint-marketplace/repository"
 )
 
-type tagRepositoryImpl struct {
-	*sql.DB
+type tagRepositoryImpl struct {}
+
+func NewTagRepositoryImpl() repository.TagRepository {
+	return &tagRepositoryImpl{}
 }
 
-func NewTagRepositoryImpl(DB *sql.DB) repository.TagRepository {
-	return &tagRepositoryImpl{DB: DB}
-}
-
-func (tagRepository *tagRepositoryImpl) Insert(ctx context.Context, tag entity.Tag) error {
-	sql := `
+func (tagRepository *tagRepositoryImpl) Insert(ctx context.Context, tx *sql.Tx, tag entity.Tag) entity.Tag {
+	SQL := `
 		INSERT INTO tags (product_id, name, created_at, updated_at)
 		VALUES ($1, $2, $3, $4);
 	`
 
-	err := tagRepository.DB.QueryRow(sql,
-		&tag.ProductId, &tag.Name, common.GetDateNowUTCFormat(), common.GetDateNowUTCFormat()).Err()
+	timeNow := common.GetDateNowUTCFormat()
 
-	return err
+	_, err := tx.ExecContext(ctx, SQL,
+		&tag.ProductId, &tag.Name, timeNow, timeNow)
+
+	exception.PanicLogging(err)
+
+	tag.CreatedAt = timeNow
+	tag.UpdatedAt = timeNow
+
+	return tag
 }
 
-func (tagRepository *tagRepositoryImpl) DeleteByProductId(ctx context.Context, productId int) error {
-	sql := `
+func (tagRepository *tagRepositoryImpl) DeleteByProductId(ctx context.Context, tx *sql.Tx, productId int) {
+	SQL := `
 		DELETE FROM tags
 		WHERE product_id = $1;
 	`
 
-	err := tagRepository.DB.QueryRow(sql, productId).Err()
+	_, err := tx.ExecContext(ctx, SQL, productId)
 
-	return err
+	exception.PanicLogging(err)
 }
