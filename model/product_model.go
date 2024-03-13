@@ -20,3 +20,15 @@ type ProductUpdateModel struct {
 	Tags           []string `json:"tags" validate:"required,min=0"`
 	IsPurchaseable bool     `json:"isPurchaseable" validate:"required"`
 }
+
+type ProductModel struct {
+	Id             int      `json:"productId"`
+	Name           string   `json:"name"`
+	Price          float32  `json:"price"`
+	ImageUrl       string   `json:"imageUrl"`
+	Stock          int      `json:"stock"`
+	Condition      string   `json:"condition"`
+	Tags           []string `json:"tags"`
+	IsPurchaseable bool     `json:"isPurchaseable"`
+	PurchaseCount  int      `json:"purchaseCount"`
+}

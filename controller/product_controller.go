@@ -28,11 +28,9 @@ func (controller ProductController) Route(app *fiber.App) {
 func (controller ProductController) Create(c *fiber.Ctx) error {
 	var request model.ProductCreateModel
 	err := c.BodyParser(&request)
-	request.UserId = 1 //hardcoded
+	request.UserId = 1 //hardcoded, wait for middleware
 	
-	if err != nil {
-		panic(err)
-	}
+	exception.PanicLogging(err)
 
 	errors := common.ValidateInput(request)
 
@@ -53,17 +51,13 @@ func (controller ProductController) Update(c *fiber.Ctx) error {
 	var request model.ProductUpdateModel
 	err := c.BodyParser(&request)
 	
-	if err != nil {
-		panic(err)
-	}
+	exception.PanicLogging(err)
 	
 	productId := c.Params("id")
 
 	request.Id, err = strconv.Atoi(productId)
 	
-	if err != nil {
-		panic(err)
-	}
+	exception.PanicLogging(err)
 
 	errors := common.ValidateInput(request)
 

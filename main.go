@@ -8,6 +8,7 @@ import (
 	service "project-sprint-marketplace/service/impl"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 )
 
@@ -16,17 +17,18 @@ func main() {
 	database := configuration.NewDatabase(config)
 
 	userRepository := repository.NewUserRepositoryImpl(database)
-	productRepository := repository.NewProductRepositoryImpl(database)
-	tagRepository := repository.NewTagRepositoryImpl(database)
+	productRepository := repository.NewProductRepositoryImpl()
+	tagRepository := repository.NewTagRepositoryImpl()
 
 	userService := service.NewUserServiceImpl(&userRepository)
-	productService := service.NewProductServiceImpl(&productRepository, &tagRepository)
+	productService := service.NewProductServiceImpl(database, &productRepository, &tagRepository)
 
 	userController := controller.NewUserController(&userService, config)
 	productController := controller.NewProductController(&productService, config)
 
 	app := fiber.New(configuration.NewFiberConfiguration())
 	app.Use(recover.New())
+	app.Use(logger.New())
 
 	userController.Route(app)
 	productController.Route(app)
