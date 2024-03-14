@@ -13,6 +13,7 @@ type ProductCreateModel struct {
 
 type ProductUpdateModel struct {
 	Id             int      `json:"id" validate:"required"`
+	UserId         int      `json:"userId" validate:"required"`
 	Name           string   `json:"name" validate:"required,min=5,max=60"`
 	Price          float32  `json:"price" validate:"required,min=0"`
 	ImageUrl       string   `json:"imageUrl" validate:"required,url"`
@@ -39,6 +40,7 @@ type GetProductModel struct {
 }
 
 type UpdateStockModel struct {
-	Id    int `json:"id" validate:"required"`
-	Stock int `json:"stock" validate:"required,min=0"`
+	Id     int `json:"id" validate:"required"`
+	UserId int `json:"userId" validate:"required"`
+	Stock  int `json:"stock" validate:"required,min=0"`
 }

@@ -18,7 +18,40 @@ func NewProductRepositoryImpl() repository.ProductRepository {
 	return &productRepositoryImpl{}
 }
 
-func (productRepository *productRepositoryImpl) FindById(ctx context.Context, db *sql.DB, id int) model.ProductModel {
+func (productRepository *productRepositoryImpl) FindById(ctx context.Context, db *sql.DB, id int) entity.Product {
+	SQL := `
+		SELECT * FROM products WHERE id = $1;
+	`
+
+	var product entity.Product
+
+	err := db.QueryRow(SQL, id).Scan(
+		&product.Id,
+		&product.UserId,
+		&product.Name,
+		&product.Price,
+		&product.ImageUrl,
+		&product.Stock,
+		&product.Condition,
+		&product.IsPurchaseable,
+		&product.CreatedAt,
+		&product.UpdatedAt,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			panic(exception.NotFoundError{
+				Message: "product not found",
+			})
+		} else {
+			exception.PanicLogging(err)
+		}
+	}
+
+	return product
+}
+
+func (productRepository *productRepositoryImpl) FindByIdAggregated(ctx context.Context, db *sql.DB, id int) model.ProductModel {
 	SQL := `
 		SELECT p.id::varchar AS product_id, p.name, p.price, p.image_url, p.stock, p.condition, ARRAY_AGG(t.name) AS tags, p.is_purchaseable, COALESCE(SUM(py.quantity), 0) AS purchase_count
 		FROM products p

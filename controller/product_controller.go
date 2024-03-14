@@ -24,10 +24,10 @@ func NewProductController(productService *service.ProductService, config configu
 
 func (controller ProductController) Route(app *fiber.App) {
 	app.Post("/v1/product", middleware.ValidateJWT(controller.Config), controller.Create)
-	app.Patch("v1/product/:id", controller.Update)
-	app.Delete("/v1/product/:id", controller.DeleteById)
+	app.Patch("v1/product/:id", middleware.ValidateJWT(controller.Config), controller.Update)
+	app.Delete("/v1/product/:id", middleware.ValidateJWT(controller.Config), controller.DeleteById)
 	app.Get("/v1/product/:id", controller.GetById)
-	app.Post("v1/product/:id/stock", controller.UpdateStock)
+	app.Post("v1/product/:id/stock", middleware.ValidateJWT(controller.Config), controller.UpdateStock)
 }
 
 func (controller ProductController) Create(c *fiber.Ctx) error {
@@ -55,6 +55,7 @@ func (controller ProductController) Create(c *fiber.Ctx) error {
 func (controller ProductController) Update(c *fiber.Ctx) error {
 	var request model.ProductUpdateModel
 	err := c.BodyParser(&request)
+	request.UserId = c.Locals("userId").(int)
 
 	exception.PanicLogging(err)
 
@@ -81,10 +82,11 @@ func (controller ProductController) Update(c *fiber.Ctx) error {
 
 func (controller ProductController) DeleteById(c *fiber.Ctx) error {
 	productId, err := strconv.Atoi(c.Params("id"))
+	userId := c.Locals("userId").(int)
 
 	exception.PanicLogging(err)
 
-	controller.ProductService.DeleteById(c.Context(), productId)
+	controller.ProductService.DeleteById(c.Context(), productId, userId)
 
 	return c.Status(fiber.StatusOK).JSON(model.ResponseFormat{
 		Message: "product deleted successfully",
@@ -109,6 +111,7 @@ func (controller ProductController) UpdateStock(c *fiber.Ctx) error {
 	body := c.Body()
 
 	err := json.Unmarshal(body, &request)
+	request.UserId = c.Locals("userId").(int)
 
 	exception.PanicLogging(err)
 
@@ -126,7 +129,7 @@ func (controller ProductController) UpdateStock(c *fiber.Ctx) error {
 		})
 	}
 
-	_ = controller.ProductService.UpdateStockById(c.Context(), request)
+	_ = controller.ProductService.UpdateStock(c.Context(), request)
 
 	return c.Status(fiber.StatusOK).JSON(model.ResponseFormat{
 		Message: "stock updated successfully",
