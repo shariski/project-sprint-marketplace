@@ -83,9 +83,20 @@ func (productRepository *productRepositoryImpl) Update(ctx context.Context, tx *
 		WHERE id = $7;
 		`
 
-	_, err := tx.ExecContext(ctx, SQL,
+	res, err := tx.ExecContext(ctx, SQL,
 		&product.Name, &product.Price, &product.ImageUrl, &product.Condition, &product.IsPurchaseable, common.GetDateNowUTCFormat(), &product.Id)
+
 	exception.PanicLogging(err)
+
+	rowsAffected, err := res.RowsAffected()
+
+	exception.PanicLogging(err)
+
+	if rowsAffected < 1 {
+		exception.PanicLogging(exception.NotFoundError{
+			Message: "Product not found",
+		})
+	}
 
 	return product
 }
@@ -96,9 +107,19 @@ func (productRepository *productRepositoryImpl) DeleteByProductId(ctx context.Co
 		WHERE id = $1;
 		`
 
-	_, err := tx.ExecContext(ctx, SQL, id)
+	res, err := tx.ExecContext(ctx, SQL, id)
 
 	exception.PanicLogging(err)
+
+	rowsAffected, err := res.RowsAffected()
+
+	exception.PanicLogging(err)
+
+	if rowsAffected < 1 {
+		exception.PanicLogging(exception.NotFoundError{
+			Message: "Product not found",
+		})
+	}
 }
 
 func (productRepository *productRepositoryImpl) UpdateStock(ctx context.Context, tx *sql.Tx, product entity.Product) entity.Product {
@@ -107,10 +128,18 @@ func (productRepository *productRepositoryImpl) UpdateStock(ctx context.Context,
 		WHERE id = $2;
 		`
 
-	_, err := tx.ExecContext(ctx, SQL,
+	res, err := tx.ExecContext(ctx, SQL,
 		&product.Stock, &product.Id)
-
 	exception.PanicLogging(err)
+
+	rowsAffected, err := res.RowsAffected()
+	exception.PanicLogging(err)
+
+	if rowsAffected < 1 {
+		exception.PanicLogging(exception.NotFoundError{
+			Message: "Product not found",
+		})
+	}
 
 	return product
 }

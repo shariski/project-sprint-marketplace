@@ -48,7 +48,6 @@ func (productService *productServiceImpl) Create(ctx context.Context, data model
 	defer common.CommitOrRollback(tx)
 
 	newProduct := productService.ProductRepository.Insert(ctx, tx, product)
-	// fmt.Println(newProduct.Id)
 
 	for _, tagName := range data.Tags {
 		tag := entity.Tag{
@@ -72,8 +71,6 @@ func (productService *productServiceImpl) Update(ctx context.Context, data model
 		IsPurchaseable: data.IsPurchaseable,
 	}
 
-	// _ = productService.ProductRepository.FindById(ctx, productService.DB, data.Id)
-
 	tx, err := productService.DB.Begin()
 	exception.PanicLogging(err)
 	defer common.CommitOrRollback(tx)
@@ -95,8 +92,6 @@ func (productService *productServiceImpl) Update(ctx context.Context, data model
 }
 
 func (productService *productServiceImpl) DeleteById(ctx context.Context, id int) {
-	_ = productService.ProductRepository.FindById(ctx, productService.DB, id)
-
 	tx, err := productService.DB.Begin()
 	exception.PanicLogging(err)
 	defer common.CommitOrRollback(tx)
@@ -122,8 +117,6 @@ func (productService *productServiceImpl) UpdateStockById(ctx context.Context, d
 		Id:    data.Id,
 		Stock: data.Stock,
 	}
-
-	_ = productService.ProductRepository.FindById(ctx, productService.DB, data.Id)
 
 	tx, err := productService.DB.Begin()
 	exception.PanicLogging(err)
