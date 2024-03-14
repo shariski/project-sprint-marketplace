@@ -11,6 +11,12 @@ type UserGetModel struct {
 	Name     string `json:"name"`
 }
 
+type AuthenticationModel struct {
+	Id       int    `json:"id"`
+	Username string `json:"username"`
+	Name     string `json:"name"`
+}
+
 type SellerModel struct {
 	Name             string        `json:"name"`
 	ProductSoldTotal int           `json:"productSoldTotal"`

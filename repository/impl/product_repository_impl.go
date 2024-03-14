@@ -12,7 +12,7 @@ import (
 	"github.com/lib/pq"
 )
 
-type productRepositoryImpl struct {}
+type productRepositoryImpl struct{}
 
 func NewProductRepositoryImpl() repository.ProductRepository {
 	return &productRepositoryImpl{}
@@ -30,7 +30,7 @@ func (productRepository *productRepositoryImpl) FindById(ctx context.Context, db
 
 	var product model.ProductModel
 	var tags pq.StringArray
-		
+
 	err := db.QueryRow(SQL, id).Scan(
 		&product.Id,
 		&product.Name,
@@ -64,7 +64,6 @@ func (productRepository *productRepositoryImpl) Insert(ctx context.Context, tx *
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 		RETURNING id;
 	`
-
 	timeNow := common.GetDateNowUTCFormat()
 
 	err := tx.QueryRowContext(ctx, SQL,
@@ -86,7 +85,6 @@ func (productRepository *productRepositoryImpl) Update(ctx context.Context, tx *
 
 	_, err := tx.ExecContext(ctx, SQL,
 		&product.Name, &product.Price, &product.ImageUrl, &product.Condition, &product.IsPurchaseable, common.GetDateNowUTCFormat(), &product.Id)
-
 	exception.PanicLogging(err)
 
 	return product
@@ -98,9 +96,9 @@ func (productRepository *productRepositoryImpl) DeleteByProductId(ctx context.Co
 		WHERE id = $1;
 		`
 
-		_, err := tx.ExecContext(ctx, SQL, id)
+	_, err := tx.ExecContext(ctx, SQL, id)
 
-		exception.PanicLogging(err)
+	exception.PanicLogging(err)
 }
 
 func (productRepository *productRepositoryImpl) UpdateStock(ctx context.Context, tx *sql.Tx, product entity.Product) entity.Product {

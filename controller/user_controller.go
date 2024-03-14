@@ -31,7 +31,7 @@ func (controller UserController) Authentication(c *fiber.Ctx) error {
 	exception.PanicLogging(err)
 
 	result := controller.UserService.Authentication(c.Context(), request)
-	accessToken := common.GenerateToken(result.Username, controller.Config)
+	accessToken := common.GenerateToken(result.Id, controller.Config)
 	userAndToken := map[string]interface{}{
 		"username":    result.Username,
 		"name":        result.Name,
@@ -53,7 +53,7 @@ func (controller UserController) Create(c *fiber.Ctx) error {
 
 	result := controller.UserService.Create(c.Context(), request)
 
-	accessToken := common.GenerateToken(result.Username, controller.Config)
+	accessToken := common.GenerateToken(result.Id, controller.Config)
 	userAndToken := map[string]interface{}{
 		"username":    result.Username,
 		"name":        result.Name,

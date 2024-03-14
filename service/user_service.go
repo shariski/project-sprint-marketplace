@@ -6,6 +6,6 @@ import (
 )
 
 type UserService interface {
-	Authentication(ctx context.Context, model model.UserModel) model.UserGetModel
-	Create(ctx context.Context, model model.UserModel) model.UserGetModel
+	Authentication(ctx context.Context, model model.UserModel) model.AuthenticationModel
+	Create(ctx context.Context, model model.UserModel) model.AuthenticationModel
 }

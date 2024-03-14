@@ -4,6 +4,7 @@ import (
 	"project-sprint-marketplace/model"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 )
 
 func ErrorHandler(ctx *fiber.Ctx, err error) error {
@@ -16,7 +17,7 @@ func ErrorHandler(ctx *fiber.Ctx, err error) error {
 		// PanicLogging(errJson)
 		return ctx.Status(fiber.StatusBadRequest).JSON(model.ResponseErrorFormat{
 			Message: "Bad Request",
-			Errors: data,
+			Errors:  data,
 		})
 	}
 
@@ -48,6 +49,7 @@ func ErrorHandler(ctx *fiber.Ctx, err error) error {
 		})
 	}
 
+	log.Error(err)
 	return ctx.Status(fiber.StatusInternalServerError).JSON(model.ResponseErrorFormat{
 		Message: "General Error",
 	})
