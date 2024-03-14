@@ -32,6 +32,21 @@ func NewProductServiceImpl(
 	}
 }
 
+func (productService *productServiceImpl) FindByFilters(ctx context.Context, filters model.ProductFilters) model.GetProductsModel {	
+	products, total := productService.ProductRepository.FindByFilters(ctx, productService.DB, filters)
+	meta := model.Meta{
+		Limit: filters.Limit,
+		Offset: filters.Offset,
+		Total: total,
+	}
+
+
+	return model.GetProductsModel{
+		Products: products,
+		Meta: meta,
+	}
+}
+
 func (productService *productServiceImpl) Create(ctx context.Context, data model.ProductCreateModel) entity.Product {
 	product := entity.Product{
 		UserId:         data.UserId,
@@ -62,6 +77,14 @@ func (productService *productServiceImpl) Create(ctx context.Context, data model
 }
 
 func (productService *productServiceImpl) Update(ctx context.Context, data model.ProductUpdateModel) entity.Product {
+	checkProduct := productService.ProductRepository.FindById(ctx, productService.DB, data.Id)
+
+	if (checkProduct.UserId != data.UserId) {
+		exception.PanicLogging(exception.ForbiddenError{
+			Message: "Forbidden",
+		})
+	}
+
 	product := entity.Product{
 		Id:             data.Id,
 		Name:           data.Name,
@@ -91,7 +114,15 @@ func (productService *productServiceImpl) Update(ctx context.Context, data model
 	return updatedProduct
 }
 
-func (productService *productServiceImpl) DeleteById(ctx context.Context, id int) {
+func (productService *productServiceImpl) DeleteById(ctx context.Context, id int, userId int) {
+	checkProduct := productService.ProductRepository.FindById(ctx, productService.DB, id)
+
+	if (checkProduct.UserId != userId) {
+		exception.PanicLogging(exception.ForbiddenError{
+			Message: "Forbidden",
+		})
+	}
+
 	tx, err := productService.DB.Begin()
 	exception.PanicLogging(err)
 	defer common.CommitOrRollback(tx)
@@ -101,7 +132,7 @@ func (productService *productServiceImpl) DeleteById(ctx context.Context, id int
 }
 
 func (productService *productServiceImpl) FindById(ctx context.Context, id int) model.GetProductModel {
-	product := productService.ProductRepository.FindById(ctx, productService.DB, id)
+	product := productService.ProductRepository.FindByIdAggregated(ctx, productService.DB, id)
 	seller := productService.UserRepository.FindByProductId(ctx, id)
 
 	payload := model.GetProductModel{
@@ -112,7 +143,15 @@ func (productService *productServiceImpl) FindById(ctx context.Context, id int) 
 	return payload
 }
 
-func (productService *productServiceImpl) UpdateStockById(ctx context.Context, data model.UpdateStockModel) entity.Product {
+func (productService *productServiceImpl) UpdateStock(ctx context.Context, data model.UpdateStockModel) entity.Product {
+	checkProduct := productService.ProductRepository.FindById(ctx, productService.DB, data.Id)
+
+	if (checkProduct.UserId != data.UserId) {
+		exception.PanicLogging(exception.ForbiddenError{
+			Message: "Forbidden",
+		})
+	}
+
 	product := entity.Product{
 		Id:    data.Id,
 		Stock: data.Stock,
