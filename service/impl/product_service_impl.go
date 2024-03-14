@@ -3,7 +3,6 @@ package impl
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"project-sprint-marketplace/common"
 	"project-sprint-marketplace/entity"
 	"project-sprint-marketplace/exception"
@@ -49,7 +48,6 @@ func (productService *productServiceImpl) Create(ctx context.Context, data model
 	defer common.CommitOrRollback(tx)
 
 	newProduct := productService.ProductRepository.Insert(ctx, tx, product)
-	fmt.Println(newProduct.Id)
 	
 	for _,tagName := range data.Tags{
 		tag := entity.Tag{
