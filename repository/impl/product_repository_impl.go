@@ -107,6 +107,8 @@ func (productRepository *productRepositoryImpl) FindByFilters(ctx context.Contex
 	if filters.SortBy != "" {
 		if filters.SortBy == "date" {
 			filters.SortBy = "p.created_at"
+		} else {
+			filters.SortBy = "p.price"
 		}
 		SQL += "ORDER BY " + filters.SortBy + " "
 		
@@ -309,12 +311,12 @@ func (productRepository *productRepositoryImpl) DeleteByProductId(ctx context.Co
 
 func (productRepository *productRepositoryImpl) UpdateStock(ctx context.Context, tx *sql.Tx, product entity.Product) entity.Product {
 	SQL := `
-		UPDATE products SET stock = $1
-		WHERE id = $2;
+		UPDATE products SET stock = $1, updated_at = $2
+		WHERE id = $3;
 		`
 
 	res, err := tx.ExecContext(ctx, SQL,
-		&product.Stock, &product.Id)
+		&product.Stock, common.GetDateNowUTCFormat(), &product.Id)
 	exception.PanicLogging(err)
 
 	rowsAffected, err := res.RowsAffected()

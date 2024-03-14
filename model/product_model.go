@@ -55,8 +55,8 @@ type ProductFilters struct {
 	ShowEmptyStock bool     `json:"showEmptyStock" query:"showEmptyStock"`
 	MaxPrice       float64  `json:"maxPrice" query:"maxPrice"`
 	MinPrice       float64  `json:"minPrice" query:"minPrice"`
-	SortBy         string   `json:"sortBy" query:"sortBy"`
-	OrderBy        string   `json:"orderBy" query:"orderBy"`
+	SortBy         string   `json:"sortBy" query:"sortBy" validate:"oneof=date price"`
+	OrderBy        string   `json:"orderBy" query:"orderBy" validate:"oneof=ASC DESC"`
 	Search         string   `json:"search" query:"search"`
 }
 

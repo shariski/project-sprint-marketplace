@@ -102,9 +102,25 @@ func (controller ProductController) GetByFilters(c *fiber.Ctx) error {
 		filters.UserId = c.Locals("userId").(int)
 	}
 
+	if filters.SortBy == "" {
+		filters.SortBy = "date"
+	}
+
+	if filters.OrderBy == "" {
+		filters.OrderBy = "ASC"
+	}
+
 	err := c.QueryParser(&filters)
 
 	exception.PanicLogging(err)
+
+	errors := common.ValidateInput(filters)
+
+	if errors != nil {
+		panic(exception.ValidationError{
+			Message: errors.Error(),
+		})
+	}
 	
 	result := controller.ProductService.FindByFilters(c.Context(), filters)
 
