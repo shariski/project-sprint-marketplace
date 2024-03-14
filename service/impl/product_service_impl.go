@@ -23,23 +23,23 @@ func NewProductServiceImpl(
 	productRepository *repository.ProductRepository,
 	tagRepository *repository.TagRepository,
 	userRepository *repository.UserRepository,
-	) service.ProductService {
+) service.ProductService {
 	return &productServiceImpl{
-		DB: DB,
+		DB:                DB,
 		ProductRepository: *productRepository,
-		TagRepository: *tagRepository,
-		UserRepository: *userRepository,
+		TagRepository:     *tagRepository,
+		UserRepository:    *userRepository,
 	}
 }
 
 func (productService *productServiceImpl) Create(ctx context.Context, data model.ProductCreateModel) entity.Product {
 	product := entity.Product{
-		UserId: data.UserId,
-		Name: data.Name,
-		Price: data.Price,
-		ImageUrl: data.ImageUrl,
-		Stock: data.Stock,
-		Condition: data.Condition,
+		UserId:         data.UserId,
+		Name:           data.Name,
+		Price:          data.Price,
+		ImageUrl:       data.ImageUrl,
+		Stock:          data.Stock,
+		Condition:      data.Condition,
 		IsPurchaseable: data.IsPurchaseable,
 	}
 
@@ -48,26 +48,26 @@ func (productService *productServiceImpl) Create(ctx context.Context, data model
 	defer common.CommitOrRollback(tx)
 
 	newProduct := productService.ProductRepository.Insert(ctx, tx, product)
-	
-	for _,tagName := range data.Tags{
+
+	for _, tagName := range data.Tags {
 		tag := entity.Tag{
 			ProductId: newProduct.Id,
-			Name: tagName,
+			Name:      tagName,
 		}
 
 		_ = productService.TagRepository.Insert(ctx, tx, tag)
 	}
 
-	return newProduct;
+	return newProduct
 }
 
 func (productService *productServiceImpl) Update(ctx context.Context, data model.ProductUpdateModel) entity.Product {
 	product := entity.Product{
-		Id: data.Id,
-		Name: data.Name,
-		Price: data.Price,
-		ImageUrl: data.ImageUrl,
-		Condition: data.Condition,
+		Id:             data.Id,
+		Name:           data.Name,
+		Price:          data.Price,
+		ImageUrl:       data.ImageUrl,
+		Condition:      data.Condition,
 		IsPurchaseable: data.IsPurchaseable,
 	}
 
@@ -76,19 +76,19 @@ func (productService *productServiceImpl) Update(ctx context.Context, data model
 	defer common.CommitOrRollback(tx)
 
 	updatedProduct := productService.ProductRepository.Update(ctx, tx, product)
-	
+
 	productService.TagRepository.DeleteByProductId(ctx, tx, data.Id)
 
-	for _,tagName := range data.Tags{
+	for _, tagName := range data.Tags {
 		tag := entity.Tag{
 			ProductId: data.Id,
-			Name: tagName,
+			Name:      tagName,
 		}
 
 		_ = productService.TagRepository.Insert(ctx, tx, tag)
 	}
-	
-	return updatedProduct;
+
+	return updatedProduct
 }
 
 func (productService *productServiceImpl) DeleteById(ctx context.Context, id int) {
@@ -106,7 +106,7 @@ func (productService *productServiceImpl) FindById(ctx context.Context, id int) 
 
 	payload := model.GetProductModel{
 		Product: product,
-		Seller: seller,
+		Seller:  seller,
 	}
 
 	return payload
@@ -114,7 +114,7 @@ func (productService *productServiceImpl) FindById(ctx context.Context, id int) 
 
 func (productService *productServiceImpl) UpdateStockById(ctx context.Context, data model.UpdateStockModel) entity.Product {
 	product := entity.Product{
-		Id: data.Id,
+		Id:    data.Id,
 		Stock: data.Stock,
 	}
 
@@ -123,6 +123,6 @@ func (productService *productServiceImpl) UpdateStockById(ctx context.Context, d
 	defer common.CommitOrRollback(tx)
 
 	updatedProduct := productService.ProductRepository.UpdateStock(ctx, tx, product)
-	
-	return updatedProduct;
+
+	return updatedProduct
 }

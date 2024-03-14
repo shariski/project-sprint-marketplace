@@ -9,6 +9,7 @@ require (
 
 require (
 	github.com/go-playground/validator/v10 v10.19.0
+	github.com/gofiber/jwt/v3 v3.3.10
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	golang.org/x/crypto v0.21.0
 )

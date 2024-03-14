@@ -40,12 +40,12 @@ func (userRepository *userRepositoryImpl) Insert(ctx context.Context, user entit
 
 func (userRepository *userRepositoryImpl) FindByUsername(ctx context.Context, username string) (entity.User, error) {
 	query := `
-		SELECT username, name, password
+		SELECT id, username, name, password
 		FROM users
-		WHERE username = $1
+		WHERE username = $1;
 	`
 	var user entity.User
-	if err := userRepository.DB.QueryRow(query, &username).Scan(&user.Username, &user.Name, &user.Password); err != nil {
+	if err := userRepository.DB.QueryRow(query, &username).Scan(&user.Id, &user.Username, &user.Name, &user.Password); err != nil {
 		if err == sql.ErrNoRows {
 			return entity.User{}, errors.New("no rows")
 		}
@@ -90,7 +90,7 @@ func (userRepository *userRepositoryImpl) FindByProductId(ctx context.Context, p
 
 	for _, data := range datas {
 		var bankAccount model.BankAccount
-		
+
 		err := json.Unmarshal([]byte(data), &bankAccount)
 		exception.PanicLogging(err)
 

@@ -20,7 +20,7 @@ func NewUserServiceImpl(userRepository *repository.UserRepository) service.UserS
 	return &userServiceImpl{UserRepository: *userRepository}
 }
 
-func (userService *userServiceImpl) Authentication(ctx context.Context, userModel model.UserModel) model.UserGetModel {
+func (userService *userServiceImpl) Authentication(ctx context.Context, userModel model.UserModel) model.AuthenticationModel {
 	userResult, err := userService.UserRepository.FindByUsername(ctx, userModel.Username)
 	if err != nil {
 		panic(exception.NotFoundError{
@@ -35,13 +35,14 @@ func (userService *userServiceImpl) Authentication(ctx context.Context, userMode
 		})
 	}
 
-	return model.UserGetModel{
+	return model.AuthenticationModel{
+		Id:       userResult.Id,
 		Username: userResult.Username,
 		Name:     userResult.Name,
 	}
 }
 
-func (userService *userServiceImpl) Create(ctx context.Context, userModel model.UserModel) model.UserGetModel {
+func (userService *userServiceImpl) Create(ctx context.Context, userModel model.UserModel) model.AuthenticationModel {
 	user := entity.User{
 		Username:  userModel.Username,
 		Name:      userModel.Name,
@@ -55,7 +56,8 @@ func (userService *userServiceImpl) Create(ctx context.Context, userModel model.
 			Message: "Username exists",
 		})
 	}
-	return model.UserGetModel{
+	return model.AuthenticationModel{
+		Id:       userResult.Id,
 		Username: userResult.Username,
 		Name:     userResult.Name,
 	}
