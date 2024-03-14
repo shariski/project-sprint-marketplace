@@ -4,6 +4,7 @@ import (
 	"project-sprint-marketplace/common"
 	"project-sprint-marketplace/configuration"
 	"project-sprint-marketplace/exception"
+	"project-sprint-marketplace/middleware"
 	"project-sprint-marketplace/model"
 	"project-sprint-marketplace/service"
 
@@ -20,7 +21,7 @@ func NewUserController(userService *service.UserService, config configuration.Co
 }
 
 func (controller UserController) Route(app *fiber.App) {
-	app.Post("/v1/user/login", controller.Authentication)
+	app.Post("/v1/user/login", middleware.ValidateJWT(controller.Config), controller.Authentication)
 	app.Post("/v1/user/register", controller.Create)
 }
 

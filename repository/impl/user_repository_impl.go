@@ -37,7 +37,7 @@ func (userRepository *userRepositoryImpl) FindByUsername(ctx context.Context, us
 	query := `
 		SELECT username, name, password
 		FROM users
-		WHERE username = $1
+		WHERE username = $1;
 	`
 	var user entity.User
 	if err := userRepository.DB.QueryRow(query, &username).Scan(&user.Username, &user.Name, &user.Password); err != nil {
