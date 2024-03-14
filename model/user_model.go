@@ -10,3 +10,9 @@ type UserGetModel struct {
 	Username string `json:"username"`
 	Name     string `json:"name"`
 }
+
+type SellerModel struct {
+	Name             string        `json:"name"`
+	ProductSoldTotal int           `json:"productSoldTotal"`
+	BankAccounts     []BankAccount `json:"bankAccounts"`
+}
