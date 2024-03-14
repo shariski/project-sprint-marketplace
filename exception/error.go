@@ -1,10 +1,12 @@
 package exception
 
-import "fmt"
+import (
+	"github.com/gofiber/fiber/v2/log"
+)
 
 func PanicLogging(err error) {
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Error(err)
 		panic(err)
 	}
 }
