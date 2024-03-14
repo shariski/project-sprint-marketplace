@@ -32,6 +32,21 @@ func NewProductServiceImpl(
 	}
 }
 
+func (productService *productServiceImpl) FindByFilters(ctx context.Context, filters model.ProductFilters) model.GetProductsModel {	
+	products, total := productService.ProductRepository.FindByFilters(ctx, productService.DB, filters)
+	meta := model.Meta{
+		Limit: filters.Limit,
+		Offset: filters.Offset,
+		Total: total,
+	}
+
+
+	return model.GetProductsModel{
+		Products: products,
+		Meta: meta,
+	}
+}
+
 func (productService *productServiceImpl) Create(ctx context.Context, data model.ProductCreateModel) entity.Product {
 	product := entity.Product{
 		UserId:         data.UserId,
@@ -136,7 +151,7 @@ func (productService *productServiceImpl) UpdateStock(ctx context.Context, data 
 			Message: "Forbidden",
 		})
 	}
-	
+
 	product := entity.Product{
 		Id:    data.Id,
 		Stock: data.Stock,

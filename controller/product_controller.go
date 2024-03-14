@@ -26,8 +26,10 @@ func (controller ProductController) Route(app *fiber.App) {
 	app.Post("/v1/product", middleware.ValidateJWT(controller.Config), controller.Create)
 	app.Patch("v1/product/:id", middleware.ValidateJWT(controller.Config), controller.Update)
 	app.Delete("/v1/product/:id", middleware.ValidateJWT(controller.Config), controller.DeleteById)
+	app.Get("/v1/product", middleware.ValidateOptionalJWT(controller.Config), controller.GetByFilters)
 	app.Get("/v1/product/:id", controller.GetById)
 	app.Post("v1/product/:id/stock", middleware.ValidateJWT(controller.Config), controller.UpdateStock)
+
 }
 
 func (controller ProductController) Create(c *fiber.Ctx) error {
@@ -90,6 +92,25 @@ func (controller ProductController) DeleteById(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(model.ResponseFormat{
 		Message: "product deleted successfully",
+	})
+}
+
+func (controller ProductController) GetByFilters(c *fiber.Ctx) error {
+	var filters model.ProductFilters
+
+	if c.Locals("userId") != nil {
+		filters.UserId = c.Locals("userId").(int)
+	}
+
+	err := c.QueryParser(&filters)
+
+	exception.PanicLogging(err)
+	
+	result := controller.ProductService.FindByFilters(c.Context(), filters)
+
+	return c.Status(fiber.StatusOK).JSON(model.ResponseFormat{
+		Message: "ok",
+		Data:    result,
 	})
 }
 

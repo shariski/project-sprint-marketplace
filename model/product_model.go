@@ -44,3 +44,29 @@ type UpdateStockModel struct {
 	UserId int `json:"userId" validate:"required"`
 	Stock  int `json:"stock" validate:"required,min=0"`
 }
+
+type ProductFilters struct {
+	UserOnly       bool     `json:"userOnly" query:"userOnly"`
+	UserId         int      `json:"userId"`
+	Limit          int      `json:"limit" query:"limit"`
+	Offset         int      `json:"offset" query:"offset"`
+	Tags           []string `json:"tags" query:"tags"`
+	Condition      string   `json:"condition" query:"condition"`
+	ShowEmptyStock bool     `json:"showEmptyStock" query:"showEmptyStock"`
+	MaxPrice       float64  `json:"maxPrice" query:"maxPrice"`
+	MinPrice       float64  `json:"minPrice" query:"minPrice"`
+	SortBy         string   `json:"sortBy" query:"sortBy"`
+	OrderBy        string   `json:"orderBy" query:"orderBy"`
+	Search         string   `json:"search" query:"search"`
+}
+
+type Meta struct {
+	Limit  int `json:"limit"`
+	Offset int `json:"offset"`
+	Total  int `json:"total"`
+}
+
+type GetProductsModel struct {
+	Products []ProductModel `json:"products"`
+	Meta     Meta           `json:"meta"`
+}
