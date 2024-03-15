@@ -19,12 +19,17 @@ func main() {
 	userRepository := repository.NewUserRepositoryImpl(database)
 	productRepository := repository.NewProductRepositoryImpl()
 	tagRepository := repository.NewTagRepositoryImpl()
+	paymentRepository := repository.NewPaymentRepositoryImpl()
+	bankAccountRepository := repository.NewBankAccountRepositoryImpl()
 
 	userService := service.NewUserServiceImpl(&userRepository)
 	productService := service.NewProductServiceImpl(database, &productRepository, &tagRepository, &userRepository)
+	paymentService := service.NewPaymentServiceImpl(database, &paymentRepository, &productRepository, &bankAccountRepository)
+	bankAccountService := service.NewBankAccountRepositoryImpl(database, &bankAccountRepository)
 
 	userController := controller.NewUserController(&userService, config)
-	productController := controller.NewProductController(&productService, config)
+	productController := controller.NewProductController(&productService, &paymentService, config)
+	bankAccountController := controller.NewBankAccountController(&bankAccountService, config)
 
 	app := fiber.New(configuration.NewFiberConfiguration())
 	app.Use(recover.New())
@@ -32,6 +37,7 @@ func main() {
 
 	userController.Route(app)
 	productController.Route(app)
+	bankAccountController.Route(app)
 
 	err := app.Listen(":8000")
 	exception.PanicLogging(err)
