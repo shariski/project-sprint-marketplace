@@ -143,3 +143,23 @@ func (productRepository *productRepositoryImpl) UpdateStock(ctx context.Context,
 
 	return product
 }
+
+func (productRepository *productRepositoryImpl) DecrementStock(ctx context.Context, tx *sql.Tx, product entity.Product, quantity int) {
+	SQL := `
+		UPDATE products
+		SET stocks = stocks - $1
+		WHERE id = $2
+		AND stocks > 0;
+	`
+	res, err := tx.ExecContext(ctx, SQL, &quantity, &product.Id)
+	exception.PanicLogging(err)
+
+	rowsAffected, err := res.RowsAffected()
+	exception.PanicLogging(err)
+
+	if rowsAffected < 1 {
+		exception.PanicLogging(exception.BadRequestError{
+			Message: "Product not found or insufficient stocks",
+		})
+	}
+}

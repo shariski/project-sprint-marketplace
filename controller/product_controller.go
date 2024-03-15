@@ -15,11 +15,12 @@ import (
 
 type ProductController struct {
 	service.ProductService
+	service.PaymentService
 	configuration.Config
 }
 
-func NewProductController(productService *service.ProductService, config configuration.Config) *ProductController {
-	return &ProductController{ProductService: *productService, Config: config}
+func NewProductController(productService *service.ProductService, paymentService *service.PaymentService, config configuration.Config) *ProductController {
+	return &ProductController{ProductService: *productService, PaymentService: *paymentService, Config: config}
 }
 
 func (controller ProductController) Route(app *fiber.App) {
@@ -28,6 +29,7 @@ func (controller ProductController) Route(app *fiber.App) {
 	app.Delete("/v1/product/:id", controller.DeleteById)
 	app.Get("/v1/product/:id", controller.GetById)
 	app.Post("v1/product/:id/stock", controller.UpdateStock)
+	app.Post("v1/product/:id/buy", middleware.ValidateJWT(controller.Config), controller.CreatePayment)
 }
 
 func (controller ProductController) Create(c *fiber.Ctx) error {
@@ -130,5 +132,29 @@ func (controller ProductController) UpdateStock(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(model.ResponseFormat{
 		Message: "stock updated successfully",
+	})
+}
+
+func (controller ProductController) CreatePayment(c *fiber.Ctx) error {
+	var request model.PaymentModel
+	body := c.Body()
+	err := json.Unmarshal(body, &request)
+	exception.PanicLogging(err)
+	productId := c.Params("id")
+	request.ProductId = productId
+
+	userId := c.Locals("userId").(int)
+
+	errors := common.ValidateInput(request)
+	if errors != nil {
+		panic(exception.ValidationError{
+			Message: errors.Error(),
+		})
+	}
+
+	_ = controller.PaymentService.Create(c.Context(), request, userId)
+
+	return c.Status(fiber.StatusOK).JSON(model.ResponseFormat{
+		Message: "payment processed successfully",
 	})
 }
