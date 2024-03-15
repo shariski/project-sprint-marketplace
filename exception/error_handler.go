@@ -8,6 +8,7 @@ import (
 )
 
 func ErrorHandler(ctx *fiber.Ctx, err error) error {
+	log.Error(err)
 	_, validationError := err.(ValidationError)
 	if validationError {
 		data := err.Error()
@@ -49,7 +50,6 @@ func ErrorHandler(ctx *fiber.Ctx, err error) error {
 		})
 	}
 
-	log.Error(err)
 	return ctx.Status(fiber.StatusInternalServerError).JSON(model.ResponseErrorFormat{
 		Message: "General Error",
 	})
