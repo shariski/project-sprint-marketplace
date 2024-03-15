@@ -34,7 +34,7 @@ func (controller FileController) Upload(c *fiber.Ctx) error {
 		})
 	}
 
-	if ext := path.Ext(file.Filename); slices.Contains([]string{"jpg", "jpeg"}, ext) {
+	if ext := path.Ext(file.Filename); !slices.Contains([]string{".jpg", ".jpeg"}, ext) {
 		exception.PanicLogging(exception.ValidationError{
 			Message: "File type must be .jpg or .jpeg",
 		})
