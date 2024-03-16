@@ -21,8 +21,13 @@ func ValidateJWT(config configuration.Config) func(*fiber.Ctx) error {
 			return c.Next()
 		},
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
-			return c.Status(fiber.StatusUnauthorized).JSON(model.ResponseErrorFormat{
-				Message: "Unauthorized",
+			if c.Get("Authorization") == "" {
+				return c.Status(fiber.StatusUnauthorized).JSON(model.ResponseErrorFormat{
+					Message: "Unauthorized",
+				})
+			}
+			return c.Status(fiber.StatusForbidden).JSON(model.ResponseErrorFormat{
+				Message: "Forbidden",
 			})
 		},
 	})

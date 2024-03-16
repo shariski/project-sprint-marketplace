@@ -99,7 +99,7 @@ func (bankAccountRepository *bankAccountRepositoryImpl) FindById(ctx context.Con
 		AND user_id = $2;
 	`
 	var bank entity.BankAccount
-	err := tx.QueryRowContext(ctx, SQL, &id).Scan(&bank.Id, &userId)
+	err := tx.QueryRowContext(ctx, SQL, &id, &userId).Scan(&bank.Id)
 	if err == sql.ErrNoRows {
 		exception.PanicLogging(exception.BadRequestError{
 			Message: "Bank account not found",

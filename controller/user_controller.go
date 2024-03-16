@@ -25,9 +25,17 @@ func (controller UserController) Route(app *fiber.App) {
 }
 
 func (controller UserController) Authentication(c *fiber.Ctx) error {
-	var request model.UserModel
+	var request model.UserLoginModel
 	err := c.BodyParser(&request)
 	exception.PanicLogging(err)
+
+	errors := common.ValidateInput(request)
+
+	if errors != nil {
+		panic(exception.ValidationError{
+			Message: errors.Error(),
+		})
+	}
 
 	result := controller.UserService.Authentication(c.Context(), request)
 	accessToken := common.GenerateToken(result.Id, controller.Config)
@@ -46,6 +54,14 @@ func (controller UserController) Create(c *fiber.Ctx) error {
 	var request model.UserModel
 	err := c.BodyParser(&request)
 	exception.PanicLogging(err)
+
+	errors := common.ValidateInput(request)
+
+	if errors != nil {
+		panic(exception.ValidationError{
+			Message: errors.Error(),
+		})
+	}
 
 	bcryptPassword := common.GenerateBcryptPassword(request.Password, controller.Config)
 	request.Password = bcryptPassword

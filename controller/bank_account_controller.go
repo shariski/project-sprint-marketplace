@@ -33,8 +33,8 @@ func (controller BankAccountController) Create(c *fiber.Ctx) error {
 	err := c.BodyParser(&request)
 	exception.PanicLogging(err)
 	request.UserId = c.Locals("userId").(int)
-	errors := common.ValidateInput(request)
 
+	errors := common.ValidateInput(request)
 	if errors != nil {
 		panic(exception.ValidationError{
 			Message: errors.Error(),
@@ -67,6 +67,7 @@ func (controller BankAccountController) Update(c *fiber.Ctx) error {
 	userId := c.Locals("userId").(int)
 	request.Id = bankId
 	request.UserId = userId
+
 	errors := common.ValidateInput(request)
 	if errors != nil {
 		panic(exception.ValidationError{
