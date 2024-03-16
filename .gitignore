@@ -1,3 +1,4 @@
 .env
 docker-compose.yaml
 /build
+Project_Sprint_Key.pem
