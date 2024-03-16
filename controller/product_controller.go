@@ -29,10 +29,8 @@ func (controller ProductController) Route(app *fiber.App) {
 	app.Delete("/v1/product/:id", middleware.ValidateJWT(controller.Config), controller.DeleteById)
 	app.Get("/v1/product", middleware.ValidateOptionalJWT(controller.Config), controller.GetByFilters)
 	app.Get("/v1/product/:id", controller.GetById)
-	app.Post("v1/product/:id/stock", controller.UpdateStock)
 	app.Post("v1/product/:id/buy", middleware.ValidateJWT(controller.Config), controller.CreatePayment)
 	app.Post("v1/product/:id/stock", middleware.ValidateJWT(controller.Config), controller.UpdateStock)
-
 }
 
 func (controller ProductController) Create(c *fiber.Ctx) error {
