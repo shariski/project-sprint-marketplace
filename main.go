@@ -8,7 +8,6 @@ import (
 	service "project-sprint-marketplace/service/impl"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 )
 
@@ -36,7 +35,6 @@ func main() {
 
 	app := fiber.New(configuration.NewFiberConfiguration())
 	app.Use(recover.New())
-	app.Use(logger.New())
 
 	userController.Route(app)
 	productController.Route(app)

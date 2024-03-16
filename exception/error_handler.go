@@ -2,6 +2,7 @@ package exception
 
 import (
 	"project-sprint-marketplace/model"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
@@ -45,6 +46,13 @@ func ErrorHandler(ctx *fiber.Ctx, err error) error {
 
 	_, badRequestError := err.(BadRequestError)
 	if badRequestError {
+		return ctx.Status(fiber.StatusBadRequest).JSON(model.ResponseErrorFormat{
+			Message: "Bad Request",
+		})
+	}
+
+	if(
+		strings.Contains(err.Error(), "json: cannot unmarshal") || strings.Contains(err.Error(), "Unprocessable Entity") || strings.Contains(err.Error(), "there is no uploaded file") || strings.Contains(err.Error(), "request Content-Type has bad boundary")) {
 		return ctx.Status(fiber.StatusBadRequest).JSON(model.ResponseErrorFormat{
 			Message: "Bad Request",
 		})
