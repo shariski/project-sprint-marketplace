@@ -14,7 +14,12 @@ func NewDatabase(config Config) *sql.DB {
 	host := config.Get("DB_HOST")
 	port := config.Get("DB_PORT")
 	dbName := config.Get("DB_NAME")
-	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, username, password, dbName)
+	var dsn string
+	if config.Get("ENV") == "production" {
+		dsn = fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=verify-full sslrootcert=ap-southeast-1-bundle.pem Timezone=UTC", username, password, host, port, dbName)
+	} else {
+		dsn = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, username, password, dbName)
+	}
 
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
