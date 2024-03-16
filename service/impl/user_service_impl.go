@@ -20,7 +20,7 @@ func NewUserServiceImpl(userRepository *repository.UserRepository) service.UserS
 	return &userServiceImpl{UserRepository: *userRepository}
 }
 
-func (userService *userServiceImpl) Authentication(ctx context.Context, userModel model.UserModel) model.AuthenticationModel {
+func (userService *userServiceImpl) Authentication(ctx context.Context, userModel model.UserLoginModel) model.AuthenticationModel {
 	userResult, err := userService.UserRepository.FindByUsername(ctx, userModel.Username)
 	if err != nil {
 		panic(exception.NotFoundError{

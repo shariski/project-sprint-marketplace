@@ -40,12 +40,12 @@ func (productRepository *productRepositoryImpl) FindByFilters(ctx context.Contex
 	}
 
 	if len(filters.Tags) > 0 {
-		if (FILTERS != "") {
+		if FILTERS != "" {
 			FILTERS += "AND "
 		}
 
 		FILTERS += "("
-		
+
 		for i, tag := range filters.Tags {
 			if i > 0 {
 				FILTERS += "OR t.name = '" + tag + "' "
@@ -58,7 +58,7 @@ func (productRepository *productRepositoryImpl) FindByFilters(ctx context.Contex
 	}
 
 	if filters.Condition != "" {
-		if (FILTERS != "") {
+		if FILTERS != "" {
 			FILTERS += "AND "
 		}
 
@@ -66,7 +66,7 @@ func (productRepository *productRepositoryImpl) FindByFilters(ctx context.Contex
 	}
 
 	if !filters.ShowEmptyStock {
-		if (FILTERS != "") {
+		if FILTERS != "" {
 			FILTERS += "AND "
 		}
 
@@ -74,23 +74,23 @@ func (productRepository *productRepositoryImpl) FindByFilters(ctx context.Contex
 	}
 
 	if filters.MaxPrice > 0 {
-		if (FILTERS != "") {
+		if FILTERS != "" {
 			FILTERS += "AND "
 		}
 
-		FILTERS += "p.price <= '" + fmt.Sprintf("%f", filters.MaxPrice) + "' " 
+		FILTERS += "p.price <= '" + fmt.Sprintf("%f", filters.MaxPrice) + "' "
 	}
 
 	if filters.MinPrice > 0 {
-		if (FILTERS != "") {
+		if FILTERS != "" {
 			FILTERS += "AND "
 		}
 
-		FILTERS += "p.price >= '" + fmt.Sprintf("%f", filters.MinPrice) + "' " 
+		FILTERS += "p.price >= '" + fmt.Sprintf("%f", filters.MinPrice) + "' "
 	}
 
 	if filters.Search != "" {
-		if (FILTERS != "") {
+		if FILTERS != "" {
 			FILTERS += "AND "
 		}
 
@@ -111,14 +111,13 @@ func (productRepository *productRepositoryImpl) FindByFilters(ctx context.Contex
 			filters.SortBy = "p.price"
 		}
 		SQL += "ORDER BY " + filters.SortBy + " "
-		
+
 		if filters.OrderBy != "" {
 			SQL += filters.OrderBy + " "
 		} else {
 			SQL += "ASC" + " "
 		}
 	}
-
 
 	if filters.Limit > 0 {
 		SQL += "LIMIT " + strconv.Itoa(filters.Limit) + " "
@@ -137,36 +136,36 @@ func (productRepository *productRepositoryImpl) FindByFilters(ctx context.Contex
 
 	rows, err := db.Query(SQL)
 	if err != nil {
-			exception.PanicLogging(err)
+		exception.PanicLogging(err)
 	}
 	defer rows.Close()
 
 	products := []model.ProductModel{}
 	for rows.Next() {
-			var product model.ProductModel
-			var tags pq.StringArray
+		var product model.ProductModel
+		var tags pq.StringArray
 
-			if err := rows.Scan(
-				&product.Id,
-				&product.Name,
-				&product.Price,
-				&product.ImageUrl,
-				&product.Stock,
-				&product.Condition,
-				&tags,
-				&product.IsPurchaseable,
-				&product.PurchaseCount,
-			); err != nil {
-				exception.PanicLogging(err)
-			}
+		if err := rows.Scan(
+			&product.Id,
+			&product.Name,
+			&product.Price,
+			&product.ImageUrl,
+			&product.Stock,
+			&product.Condition,
+			&tags,
+			&product.IsPurchaseable,
+			&product.PurchaseCount,
+		); err != nil {
+			exception.PanicLogging(err)
+		}
 
-			product.Tags = []string(tags)
+		product.Tags = []string(tags)
 
-			products = append(products, product)
+		products = append(products, product)
 	}
 
 	if err := rows.Err(); err != nil {
-			exception.PanicLogging(err)
+		exception.PanicLogging(err)
 	}
 
 	return products, total
@@ -334,11 +333,12 @@ func (productRepository *productRepositoryImpl) UpdateStock(ctx context.Context,
 func (productRepository *productRepositoryImpl) DecrementStock(ctx context.Context, tx *sql.Tx, product entity.Product, quantity int) {
 	SQL := `
 		UPDATE products
-		SET stocks = stocks - $1
+		SET stock = stock - $1
 		WHERE id = $2
-		AND stocks > 0;
+		AND stock > 0
+		AND (stock - $3) >= 0;
 	`
-	res, err := tx.ExecContext(ctx, SQL, &quantity, &product.Id)
+	res, err := tx.ExecContext(ctx, SQL, &quantity, &product.Id, &quantity)
 	exception.PanicLogging(err)
 
 	rowsAffected, err := res.RowsAffected()
